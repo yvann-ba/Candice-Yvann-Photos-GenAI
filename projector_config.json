@@ -3,8 +3,8 @@
       {
         "tensorName": "My tensor",
         "tensorShape": [
-          1000,
-          50
+          102,
+          768
         ],
         "tensorPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/main/vectors.tsv",
         "metadataPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/main/metadata.tsv",
