@@ -1,20 +1,20 @@
 {
-    "embeddings": [
-      {
-        "tensorName": "My tensor",
-        "tensorShape": [
-          102,
-          768
-        ],
-        "tensorPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/main/vectors.tsv",
-        "metadataPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/main/metadata.tsv",
-        "sprite": {
-          "imagePath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/main/sprite.png",
-          "singleImageDim": [
-            32,
-            32
-          ]
-        }
+  "embeddings": [
+    {
+      "tensorName": "CandicePhotos_In_LatentSpace",
+      "tensorShape": [
+        503,
+        768
+      ],
+      "tensorPath": "vectors.tsv",
+      "metadataPath": "metadata.tsv",
+      "sprite": {
+        "imagePath": "https://github.com/.../optional.sprite.png",
+        "singleImageDim": [
+          32,
+          32
+        ]
       }
-    ]
-  }
+    }
+  ]
+}

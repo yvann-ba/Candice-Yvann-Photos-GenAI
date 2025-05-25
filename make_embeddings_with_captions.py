@@ -268,12 +268,14 @@ def main():
         print(f"❌ Error: Directory '{photos_dir}' not found!")
         return
     
-    # 3. Gather photos with various extensions
-    image_extensions = ["*.jpg", "*.jpeg", "*.JPG", "*.JPEG", "*.png", "*.PNG"]
+    # 3. Gather photos with various extensions (only in the specified folder, not subdirectories)
+    image_extensions = [".jpg", ".jpeg", ".png"]  # Simplified extensions list
     photos = []
     
-    for ext in image_extensions:
-        photos.extend(photos_dir.glob(ext))
+    # Use iterdir() to only look in the specified folder (non-recursive)
+    for file_path in photos_dir.iterdir():
+        if file_path.is_file() and file_path.suffix.lower() in image_extensions:
+            photos.append(file_path)
     
     # Sort the photos by name for consistent ordering
     photos = sorted(photos)
