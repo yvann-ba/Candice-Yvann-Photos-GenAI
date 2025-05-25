@@ -3,7 +3,7 @@
     {
       "tensorName": "DINOv2 + Rich Artistic Metadata",
       "tensorShape": [
-        3,
+        525,
         1024
       ],
       "tensorPath": "vectors.tsv",

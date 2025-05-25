@@ -324,7 +324,7 @@ def process_images_batch_gpu(images_batch, dinov2_model, dinov2_processor, instr
         dinov2_inputs = {k: v.to(device) for k, v in dinov2_inputs.items()}
         
         # Generate embeddings with mixed precision using DINOv2
-        with torch.cuda.amp.autocast():
+        with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
             dinov2_outputs = dinov2_model(**dinov2_inputs)
             # Use the CLS token (first token) for global image representation
             embeddings = dinov2_outputs.last_hidden_state[:, 0, :]  # [batch_size, hidden_size]
@@ -343,18 +343,22 @@ def process_images_batch_gpu(images_batch, dinov2_model, dinov2_processor, instr
         instructblip_inputs = instructblip_processor(images=images_batch, text=prompts, return_tensors="pt", padding=True)
         instructblip_inputs = {k: v.to(device) for k, v in instructblip_inputs.items()}
         
+        # Ensure all inputs are on the same device to avoid multi-GPU issues
+        for key in instructblip_inputs:
+            if hasattr(instructblip_inputs[key], 'to'):
+                instructblip_inputs[key] = instructblip_inputs[key].to(device)
+        
         # Generate captions with mixed precision using InstructBLIP
-        with torch.cuda.amp.autocast():
+        with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
             output_ids = instructblip_model.generate(
                 **instructblip_inputs,
                 max_length=max_caption_length,
-                num_beams=3,  # Reduced for more creativity
+                num_beams=1,  # Use greedy decoding for stability
                 early_stopping=True,
-                do_sample=True,  # Enable sampling for variety
-                temperature=0.7,  # Add some creativity
-                repetition_penalty=2.0,  # Stronger penalty for repetition
-                length_penalty=0.8,  # Encourage shorter responses
-                no_repeat_ngram_size=3  # Prevent 3-gram repetition
+                do_sample=False,  # Disable sampling for consistency
+                repetition_penalty=1.2,  # Moderate penalty for repetition
+                length_penalty=1.0,  # Balanced length preference
+                no_repeat_ngram_size=2  # Prevent 2-gram repetition
             )
         
         # Process captions
@@ -404,13 +408,13 @@ def calculate_optimal_batch_size(device):
         
         # Optimized for RTX 4090 with 24GB VRAM
         if gpu_memory_gb >= 20:  # RTX 4090, A6000, etc.
-            return 12  # Increased batch size for better performance
+            return 16  # Increased batch size for better performance with RTX 4090
         elif gpu_memory_gb >= 16:  # RTX 4080, etc.
-            return 8
+            return 12
         elif gpu_memory_gb >= 12:  # RTX 3080 Ti, etc.
-            return 6
+            return 8
         else:
-            return 4
+            return 6
     else:
         return 2
 
@@ -438,13 +442,13 @@ def main():
     # 1. Load DINOv2-Large for embeddings
     print("🤖 Loading DINOv2-Large model for embeddings...")
     dinov2_processor = AutoImageProcessor.from_pretrained("facebook/dinov2-large")
-    dinov2_model = AutoModel.from_pretrained("facebook/dinov2-large").eval()
+    dinov2_model = AutoModel.from_pretrained("facebook/dinov2-large", torch_dtype=torch.float16 if device.type == 'cuda' else torch.float32).eval()
     dinov2_model = dinov2_model.to(device)
     
     # 2. Load InstructBLIP-FLan-T5-XL for captioning
     print("🖼️  Loading InstructBLIP-FLan-T5-XL model for enhanced captioning...")
     instructblip_processor = InstructBlipProcessor.from_pretrained("Salesforce/instructblip-flan-t5-xl")
-    instructblip_model = InstructBlipForConditionalGeneration.from_pretrained("Salesforce/instructblip-flan-t5-xl").eval()
+    instructblip_model = InstructBlipForConditionalGeneration.from_pretrained("Salesforce/instructblip-flan-t5-xl", torch_dtype=torch.float16 if device.type == 'cuda' else torch.float32).eval()
     instructblip_model = instructblip_model.to(device)
     
     print(f"✅ Models loaded on {device}")
