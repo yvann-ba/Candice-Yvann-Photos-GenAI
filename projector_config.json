@@ -6,13 +6,13 @@
         503,
         768
       ],
-      "tensorPath": "vectors.tsv",
-      "metadataPath": "metadata.tsv",
+      "tensorPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/vectors.tsv",
+      "metadataPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/metadata.tsv",
       "sprite": {
-        "imagePath": "https://github.com/.../optional.sprite.png",
+        "imagePath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/sprite.png",
         "singleImageDim": [
-          32,
-          32
+          64,
+          64
         ]
       }
     }
