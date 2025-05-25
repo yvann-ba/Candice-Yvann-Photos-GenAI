@@ -1,7 +1,7 @@
 {
   "embeddings": [
     {
-      "tensorName": "DINOv2 Image Embeddings (Large)",
+      "tensorName": "DINOv2 + Rich Artistic Metadata",
       "tensorShape": [
         3,
         1024
