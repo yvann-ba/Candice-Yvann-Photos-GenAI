@@ -1,0 +1,36 @@
+Project Context — What you’re building
+Goal
+Turn an un-labelled folder of ~hunderds of photos into an interactive latent-space map that shows each photo as a thumbnail, lets you colour-code by auto-generated captions, and is shareable via a single URL.
+for this i use the project https://projector.tensorflow.org/
+
+End-to-end workflow
+Step	Action	Key tools / libraries
+1	Generate image embeddings (512- or 768-D vectors)	Python + PyTorch, 🤗 transformers; model CLIP ViT-L/14 (openai/clip-vit-large-patch14)
+2	Auto-caption each photo (short English description)	🤗 transformers; model BLIP base (Salesforce/blip-image-captioning-base)
+3	Write TensorBoard Projector files	vectors.tsv ← embeddings
+metadata.tsv ← captions (or filenames)
+4	Create a sprite sheet (grid of 64×64 px thumbnails)	Python + Pillow (Image.thumbnail, Image.paste)
+5	Local exploration	Load the three files into Embedding Projector (projector.tensorflow.org) and tweak PCA / t-SNE / UMAP
+6	Publish & share	Host the four plain files (vectors.tsv, metadata.tsv, sprite.png, optional bookmarks.tsv) + a small projector_config.json on GitHub Gist/S3; paste the raw URL in Projector’s Publish dialog to get a public link
+
+Scripts you’ve written
+make_embeddings_with_captions.py
+Loads CLIP, computes embeddings; loads BLIP, produces ≤12-token captions; saves TSVs; optional file-rename to caption-slugs.
+
+make_sprite.py
+Builds sprite.png; Pillow ≥10 compatible (Image.Resampling.LANCZOS).
+
+Output artefacts (for the Projector)
+
+vectors.tsv          # N rows × D dims   (CLIP features)
+metadata.tsv         # 1 header + N captions
+sprite.png           # tiled thumbnails, e.g. 13×8 grid
+projector_config.json
+projector_config.json snippet:
+Hardware & environment
+RTX 4090 workstation (remote)
+
+
+
+
+
