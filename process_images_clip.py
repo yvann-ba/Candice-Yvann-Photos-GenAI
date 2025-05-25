@@ -1,17 +1,35 @@
 from pathlib import Path
 from PIL import Image
 import torch
-from transformers import CLIPProcessor, CLIPModel
+from transformers import CLIPProcessor, CLIPModel, BlipProcessor, BlipForConditionalGeneration
 import os
+import re
+import argparse
+
+def get_short_description(text, max_words=3):
+    # Remove special characters and split into words
+    words = re.findall(r'\b\w+\b', text.lower())
+    # Take first max_words words
+    return '_'.join(words[:max_words])
 
 def main():
-    # 1. Load CLIP model
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Process images with CLIP and BLIP models')
+    parser.add_argument('--input_folder', type=str, required=True,
+                      help='Path to the folder containing images to process')
+    args = parser.parse_args()
+
+    # 1. Load CLIP and BLIP models
     print("Loading CLIP model...")
     model = CLIPModel.from_pretrained("openai/clip-vit-large-patch14").eval()
     processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
     
+    print("Loading BLIP model...")
+    blip_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+    blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base").eval()
+    
     # 2. Define the photos directory
-    photos_dir = Path("wetransfer_banque-d-images-2024-2025_2025-05-22_0809")
+    photos_dir = Path(args.input_folder)
     
     # Check if directory exists
     if not photos_dir.exists():
@@ -34,9 +52,10 @@ def main():
         print("No images found in the directory!")
         return
     
-    # 4. Compute embeddings
+    # 4. Compute embeddings and generate descriptions
     embeddings = []
     filenames = []
+    descriptions = []
     
     print("Processing images...")
     with torch.no_grad():
@@ -51,8 +70,24 @@ def main():
                 inputs = processor(images=img, return_tensors="pt")
                 feat = model.get_image_features(**inputs).squeeze().cpu().numpy()
                 
+                # Generate description with BLIP
+                blip_inputs = blip_processor(img, return_tensors="pt")
+                output_ids = blip_model.generate(**blip_inputs, max_length=30)
+                description = blip_processor.decode(output_ids[0], skip_special_tokens=True)
+                
+                # Get short description for filename
+                short_desc = get_short_description(description)
+                
+                # Create new filename with short description
+                new_filename = f"{short_desc}{img_path.suffix}"
+                new_path = img_path.parent / new_filename
+                
+                # Rename file
+                img_path.rename(new_path)
+                
                 embeddings.append(feat)
-                filenames.append(img_path.name)
+                filenames.append(new_filename)
+                descriptions.append(description)
                 
             except Exception as e:
                 print(f"Error processing {img_path.name}: {e}")
@@ -69,14 +104,14 @@ def main():
     # 6. Write metadata.tsv
     print("Writing metadata.tsv...")
     with open("metadata.tsv", "w", encoding="utf-8") as mf:
-        mf.write("filename\n")
-        for name in filenames:
-            mf.write(f"{name}\n")
+        mf.write("filename\tdescription\n")
+        for name, desc in zip(filenames, descriptions):
+            mf.write(f"{name}\t{desc}\n")
     
     print("Processing complete!")
     print(f"Generated files:")
     print(f"- vectors.tsv ({len(embeddings)} vectors)")
-    print(f"- metadata.tsv ({len(filenames)} filenames)")
+    print(f"- metadata.tsv ({len(filenames)} filenames with descriptions)")
 
 if __name__ == "__main__":
     main() 
