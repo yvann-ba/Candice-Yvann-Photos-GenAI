@@ -9,7 +9,7 @@
       "tensorPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/vectors.tsv",
       "metadataPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/metadata.tsv",
       "sprite": {
-        "imagePath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/sprite_128.png",
+        "imagePath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/sprite_64.png",
         "singleImageDim": [
           64,
           64
