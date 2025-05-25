@@ -6,10 +6,10 @@
         503,
         768
       ],
-      "tensorPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/embeddings_2/refs/heads/main/vectors.tsv",
-      "metadataPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/embeddings_2/refs/heads/main/metadata.tsv",
+      "tensorPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/vectors.tsv",
+      "metadataPath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/metadata.tsv",
       "sprite": {
-        "imagePath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/embeddings_2/refs/heads/main/sprite_fit_transparent_64.png",
+        "imagePath": "https://raw.githubusercontent.com/yvann-ba/Candice-Yvann-Photos-GenAI/refs/heads/main/embeddings_2/sprite_fit_transparent_64.png",
         "singleImageDim": [
           64,
           64
